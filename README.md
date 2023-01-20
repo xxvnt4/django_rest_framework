@@ -2,6 +2,7 @@
 
 #### [1. Введение](#введение)
 #### [2. Установка](#установка)
+#### [3. Базовый класс APIView для представлений](#базовый-класс-apiview-для-представлений)
 ---
 
 ## ВВЕДЕНИЕ
@@ -136,8 +137,53 @@ from .models import Women
 
 admin.site.register(Women)
 ```
+---
 
+## БАЗОВЫЙ КЛАСС APIVIEW ДЛЯ ПРЕДСТАВЛЕНИЙ
 
+[_YouTube_](https://youtu.be/HNqt2wZyKz4)
 
+- Создание представления
 
+```python
+class WomenApiView(generics.ListAPIView):
+    queryset = Women.objects.all()
+    serializer_class = WomenSerializer
+```
 
+- Создание сериализатора
+
+```python
+class WomenSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Women
+        fields = ('title', 'cat_id')
+```
+
+- Маршрутизация
+
+```python
+urlpatterns = [
+    ...
+    path('api/v1/womenlist/', WomenAPIView.as_view())
+]
+```
+
+**women/views.py**
+
+```python
+class WomenAPIView(APIView):
+# Класс APIView стоит во главе иерархии всех классов представления DRF.
+# Представляет самый базовый функционал для работы различных классов представлений.
+    def get(self, request):
+        lst = Women.objects.all().values()
+        return Response({'posts': list(lst)})
+
+    def post(self, request):
+        post_new = Women.objects.create(
+            title = request.data['title'],
+            content = request.data['content'],
+            cat_id = request.data['cat_id']
+        )
+        return Response({'post': model_to_dict(post_new)})
+```
