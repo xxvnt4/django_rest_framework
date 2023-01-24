@@ -3,6 +3,7 @@
 #### [1. Введение](#введение)
 #### [2. Установка](#установка)
 #### [3. Базовый класс APIView для представлений](#базовый-класс-apiview-для-представлений)
+#### [4. Введение в сериализацию, класс Serializer](#введение-в-сериализацию-класс-serializer)
 ---
 
 ## ВВЕДЕНИЕ
@@ -186,4 +187,69 @@ class WomenAPIView(APIView):
             cat_id = request.data['cat_id']
         )
         return Response({'post': model_to_dict(post_new)})
+```
+
+---
+
+## ВВЕДЕНИЕ В СЕРИАЛИЗАЦИЮ, КЛАСС SERIALIZER
+
+[_YouTube_](https://youtu.be/OTHjIsv8_Hc)
+
+**Процесс кодирования и декодирования:**
+
+```python
+WomenModel:
+   def __init__(self, title, content):
+       self.title = title
+        self.content = content
+
+class WomenSerializer(serializers.Serializer):
+    title = serializers.CharField(max_length=255)
+    content = serializers.CharField()
+
+def encode():
+    model = WomenModel('Angelina Jolie', 'Content: Angelina Jolie')
+    model_sr = WomenSerializer(model)
+    print(model_sr.data, type(model_sr.data), sep='\n')
+    json = JSONRenderer() .render(model_sr.data)
+    print(json)
+
+def decode():
+    stream = io.BytesIO(b'{"title":"Angelina Jolie","content":"Content: Angelina Jolie"}')
+    data = JSONParser().parse(stream)
+    serializer = WomenSerializer(data=data)
+    serializer.is_valid()
+    print(serializer.validated_data)
+```
+
+**women/serializers.py**
+
+```python
+class WomenSerializer(serializers.Serializer):
+    title = serializers.CharField(max_length=255)
+    content = serializers.CharField()
+    time_create = serializers.DateTimeField(read_only=True)
+    time_update = serializers.DateTimeField(read_only=True)
+    is_published = serializers.BooleanField(default=True)
+    cat_id = serializers.IntegerField()
+```
+
+**women/views.py**
+
+```python
+class WomenAPIView(APIView):
+    def get(self, request):
+        w = Women.objects.all()
+        return Response({'posts': WomenSerializer(w, many=True).data})
+
+    def post(self, request):
+        serializer = WomenSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        post_new = Women.objects.create(
+            title = request.data['title'],
+            content = request.data['content'],
+            cat_id = request.data['cat_id']
+        )
+        return Response({'post': WomenSerializer(post_new).data})
 ```
