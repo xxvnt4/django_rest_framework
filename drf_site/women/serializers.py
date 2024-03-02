@@ -13,20 +13,20 @@ from .models import Women
 #        self.content = content
 
 
-class WomenSerializer(serializers.ModelSerializer):
-   class Meta:
-       model = Women
-       fields = ('title', 'cat_id')
-
-
-
 # class WomenSerializer(serializers.Serializer):
-#     title = serializers.CharField(max_length=255)
-#     content = serializers.CharField()
-#     time_create = serializers.DateTimeField(read_only=True)
-#     time_update = serializers.DateTimeField(read_only=True)
-#     is_published = serializers.BooleanField(default=True)
-#     cat_id = serializers.IntegerField()
+#    class Meta:
+#        model = Women
+#        fields = ('title', 'cat_id')
+
+
+
+class WomenSerializer(serializers.Serializer):
+    title = serializers.CharField(max_length=255)
+    content = serializers.CharField()
+    time_create = serializers.DateTimeField(read_only=True)
+    time_update = serializers.DateTimeField(read_only=True)
+    is_published = serializers.BooleanField(default=True)
+    cat_id = serializers.IntegerField()
 
 
 
@@ -34,7 +34,7 @@ class WomenSerializer(serializers.ModelSerializer):
 #     model = WomenModel('Angelina Jolie', 'Content: Angelina Jolie')
 #     model_sr = WomenSerializer(model)
 #     print(model_sr.data, type(model_sr.data), sep='\n')
-#     json = JSONRenderer() .render(model_sr.data)
+#     json = JSONRenderer().render(model_sr.data)
 #     print(json)
 #
 #
