@@ -13,8 +13,8 @@ from rest_framework.views import APIView
 #     serializer_class = WomenSerializer
 
 class WomenAPIView(APIView):
-# Класс APIView стоит во главе иерархии всех классов представления DRF.
-# Представляет самый базовый функционал для работы различных классов представлений.
+    # Класс APIView стоит во главе иерархии всех классов представления DRF.
+    # Представляет самый базовый функционал для работы различных классов представлений.
     def get(self, request):
         w = Women.objects.all()
         return Response({'posts': WomenSerializer(w, many=True).data})
@@ -24,8 +24,8 @@ class WomenAPIView(APIView):
         serializer.is_valid(raise_exception=True)
 
         post_new = Women.objects.create(
-            title = request.data['title'],
-            content = request.data['content'],
-            cat_id = request.data['cat_id']
+            title=request.data['title'],
+            content=request.data['content'],
+            cat_id=request.data['cat_id']
         )
         return Response({'post': WomenSerializer(post_new).data})

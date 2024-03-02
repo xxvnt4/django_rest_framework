@@ -4,6 +4,8 @@ from rest_framework import serializers
 from rest_framework.parsers import JSONParser
 from rest_framework.renderers import JSONRenderer
 
+from .models import Women
+
 
 # class WomenModel:
 #    def __init__(self, title, content):
@@ -11,14 +13,20 @@ from rest_framework.renderers import JSONRenderer
 #        self.content = content
 
 
+class WomenSerializer(serializers.ModelSerializer):
+   class Meta:
+       model = Women
+       fields = ('title', 'cat_id')
 
-class WomenSerializer(serializers.Serializer):
-    title = serializers.CharField(max_length=255)
-    content = serializers.CharField()
-    time_create = serializers.DateTimeField(read_only=True)
-    time_update = serializers.DateTimeField(read_only=True)
-    is_published = serializers.BooleanField(default=True)
-    cat_id = serializers.IntegerField()
+
+
+# class WomenSerializer(serializers.Serializer):
+#     title = serializers.CharField(max_length=255)
+#     content = serializers.CharField()
+#     time_create = serializers.DateTimeField(read_only=True)
+#     time_update = serializers.DateTimeField(read_only=True)
+#     is_published = serializers.BooleanField(default=True)
+#     cat_id = serializers.IntegerField()
 
 
 
