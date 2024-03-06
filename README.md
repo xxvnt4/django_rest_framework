@@ -260,7 +260,7 @@ class WomenAPIView(APIView):
 
 ## МЕТОДЫ SAVE(), CREATE() И UPDATE() КЛАССА SERIALIZER
 
-[__YouTube__](https://youtu.be/tW7Bg5zMyKI?si=uDdv4pIE1VPZnDIQ)
+[_YouTube_](https://youtu.be/tW7Bg5zMyKI?si=uDdv4pIE1VPZnDIQ)
 
 create(self, vaidated_data) - для добавления (создания) записи (данных)
 update(self, instance, validated_data) - для изменения данных (записи)
@@ -363,7 +363,7 @@ urlpatterns = [
 
 ## КЛАСС ModelSerializer И ПРЕДСТАВЛЕНИЕ ListCreateAPIView
 
-[__YouTube__](https://youtu.be/-7NbLKn5L9w?si=JVy0fS2BcEz7yRNl)
+[_YouTube_](https://youtu.be/-7NbLKn5L9w?si=JVy0fS2BcEz7yRNl)
 
 В **Django REST Framework** существует несколько предопределенных базовых классов:
 
@@ -377,7 +377,7 @@ urlpatterns = [
 - **RetrieveDestroyAPIView** - чтение по GET-запросу и удаление по DELETE-запросу отдельной записи
 - **RetrieveUpdateDestroyAPIView** - чтение, изменение и добавление отдельной записи по GET-, PUT-, PATCH- и DELETE-запросу
 
-[__Подробнее, Django REST Framework, Generic views__](https://www.django-rest-framework.org/api-guide/generic-views/)
+[_Подробнее, Django REST Framework, Generic views_](https://www.django-rest-framework.org/api-guide/generic-views/)
 
 **women/views.py**
 
