@@ -4,6 +4,7 @@
 #### [2. Установка](#установка)
 #### [3. Базовый класс APIView для представлений](#базовый-класс-apiview-для-представлений)
 #### [4. Введение в сериализацию, класс Serializer](#введение-в-сериализацию-класс-serializer)
+#### [5. Методы save(), create() и update() класса Serializer](#методы-save-create-и-update-класса-serializer)
 ---
 
 ## ВВЕДЕНИЕ
@@ -252,4 +253,107 @@ class WomenAPIView(APIView):
             cat_id = request.data['cat_id']
         )
         return Response({'post': WomenSerializer(post_new).data})
+```
+
+---
+
+## МЕТОДЫ SAVE(), CREATE() И UPDATE() КЛАССА SERIALIZER
+
+[__YouTube__](https://youtu.be/tW7Bg5zMyKI?si=uDdv4pIE1VPZnDIQ)
+
+create(self, vaidated_data) - для добавления (создания) записи (данных)
+update(self, instance, validated_data) - для изменения данных (записи)
+
+**women/views.py**
+
+```python
+class WomenAPIView(APIView):
+    # Класс APIView стоит во главе иерархии всех классов представления DRF.
+    # Представляет самый базовый функционал для работы различных классов представлений.
+    def get(self, request):
+        w = Women.objects.all()
+        return Response({'posts': WomenSerializer(w, many=True).data})
+
+    def post(self, request):
+        serializer = WomenSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response({'post': serializer.data})
+
+    def put(self, request, *args, **kwargs):
+        pk = kwargs.get("pk", None)
+
+        if not pk:
+            return Response({"error": "Method PUT not allowed"})
+
+        try:
+            instance = Women.objects.get(pk=pk)
+        except:
+            return Response({"error": "Object does not exist"})
+
+        serializer = WomenSerializer(data=request.data, instance=instance)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response({"post": serializer.data})
+
+    def delete(self, request, *args, **kwargs):
+        pk = kwargs.get("pk", None)
+
+        if not pk:
+            return Response({"error": "Method DELETE not allowed"})
+
+        try:
+            instance = Women.objects.get(pk=pk)
+            instance.delete()
+        except:
+            return Response({"error": "Object does not exist"})
+
+        return Response({"post": "delete post" + str(pk)})
+```
+
+**women/serializer.py**
+
+```python
+class WomenSerializer(serializers.Serializer):
+    title = serializers.CharField(max_length=255)
+    content = serializers.CharField()
+    time_create = serializers.DateTimeField(read_only=True)
+    time_update = serializers.DateTimeField(read_only=True)
+    is_published = serializers.BooleanField(default=True)
+    cat_id = serializers.IntegerField()
+
+    def create(self, validated_data):
+        return Women.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        instance.title = validated_data.get("title", instance.title)
+        instance.content = validated_data.get("content", instance.content)
+        instance.time_update = validated_data.get("time_update", instance.time_update)
+        instance.is_published = validated_data.get("is_published", instance.is_published)
+        instance.cat_id = validated_data.get("cat_id", instance.cat_id)
+        instance.save()
+
+        return instance
+
+    def delete(self, instance, validated_data):
+        instance.title = validated_data.get("title", instance.title)
+        instance.content = validated_data.get("content", instance.content)
+        instance.time_update = validated_data.get("time_update", instance.time_update)
+        instance.is_published = validated_data.get("is_published", instance.is_published)
+        instance.cat_id = validated_data.get("cat_id", instance.cat_id)
+        instance.delete()
+
+        return instance
+```
+
+**drf_site/urls.py**
+
+```python
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('api/v1/womenlist', WomenAPIView.as_view()),
+    path('api/v1/womenlist/<int:pk>', WomenAPIView.as_view()),
+]
 ```
