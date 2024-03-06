@@ -5,6 +5,7 @@
 #### [3. Базовый класс APIView для представлений](#базовый-класс-apiview-для-представлений)
 #### [4. Введение в сериализацию, класс Serializer](#введение-в-сериализацию-класс-serializer)
 #### [5. Методы save(), create() и update() класса Serializer](#методы-save-create-и-update-класса-serializer)
+#### [6. Класс ModelSerializer и представление ListCreateAPIView](#класс-modelserializer-и-представление-listcreateapiview)
 ---
 
 ## ВВЕДЕНИЕ
@@ -355,5 +356,53 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/womenlist', WomenAPIView.as_view()),
     path('api/v1/womenlist/<int:pk>', WomenAPIView.as_view()),
+]
+```
+
+---
+
+## КЛАСС ModelSerializer И ПРЕДСТАВЛЕНИЕ ListCreateAPIView
+
+[__YouTube__](https://youtu.be/-7NbLKn5L9w?si=JVy0fS2BcEz7yRNl)
+
+В **Django REST Framework** существует несколько предопределенных базовых классов:
+
+- **СreateAPIView** - создание данных по POST-запросу
+- **ListAPIView** - чтение списка данных по GET-запросу
+- **RetrieveAPIView** - чтение конкретных данных по GET-запросу
+- **DestroyAPIView** - удаление данных по DELETE-запросу
+- **UpdateAPIView** - изменение записи по PUT- или PATCH-запросу
+- **ListCreateAPIView** - чтение по GET-запросу и создание списка данных по POST-запросу
+- **RetrieveUpdateAPIView** - чтение и изменение отдельной записи по GET- и POST-запросу
+- **RetrieveDestroyAPIView** - чтение по GET-запросу и удаление по DELETE-запросу отдельной записи
+- **RetrieveUpdateDestroyAPIView** - чтение, изменение и добавление отдельной записи по GET-, PUT-, PATCH- и DELETE-запросу
+
+[__Подробнее, Django REST Framework, Generic views__](https://www.django-rest-framework.org/api-guide/generic-views/)
+
+**women/views.py**
+
+```python
+class WomenAPIList(generics.ListCreateAPIView):
+    queryset = Women.objects.all()
+    serializer_class = WomenSerializer
+```
+
+**women/serializers.py**
+
+```python
+class WomenSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Women
+        # fields = ("title", "content", "cat")
+        fields = "__all__"
+```
+
+**drf_site/urls.py**
+
+```python
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('api/v1/womenlist', WomenAPIList.as_view()),
+    path('api/v1/womenlist/<int:pk>', WomenAPIList.as_view()),
 ]
 ```
