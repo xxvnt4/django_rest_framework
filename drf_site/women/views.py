@@ -18,6 +18,17 @@ class WomenAPIList(generics.ListCreateAPIView):
     serializer_class = WomenSerializer
 
 
+class WomenAPIUpdate(generics.UpdateAPIView):
+    queryset = Women.objects.all()
+    serializer_class = WomenSerializer
+
+
+class WomenAPIDetailView(generics.RetrieveUpdateDestroyAPIView):
+    # для операций CRUD (Create, Read, Update, Delete)
+    queryset = Women.objects.all()
+    serializer_class = WomenSerializer
+
+
 # class WomenAPIView(APIView):
 #     # Класс APIView стоит во главе иерархии всех классов представления DRF.
 #     # Представляет самый базовый функционал для работы различных классов представлений.

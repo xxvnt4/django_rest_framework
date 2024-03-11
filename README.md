@@ -6,6 +6,7 @@
 #### [4. Введение в сериализацию, класс Serializer](#введение-в-сериализацию-класс-serializer)
 #### [5. Методы save(), create() и update() класса Serializer](#методы-save-create-и-update-класса-serializer)
 #### [6. Класс ModelSerializer и представление ListCreateAPIView](#класс-modelserializer-и-представление-listcreateapiview)
+#### [7. Представления UpdateAPIView и RetrieveUpdateDestroyAPIView](#представления-updateapiview-и-retrieveupdatedestroyapiview)
 ---
 
 ## ВВЕДЕНИЕ
@@ -405,4 +406,47 @@ urlpatterns = [
     path('api/v1/womenlist', WomenAPIList.as_view()),
     path('api/v1/womenlist/<int:pk>', WomenAPIList.as_view()),
 ]
+```
+
+---
+
+## ПРЕДСТАВЛЕНИЯ UpdateAPIView и RetrieveUpdateDestroyAPIView
+
+[_YouTube_](https://youtu.be/m7asgk5F0u8?si=YqskcaguP0laSG3_)
+
+**drf_site/settings.py**
+
+```python
+# так можно управлять глобальными настройками REST-фреймворка
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': [ # класс рендера
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRender', # API браузера, нужно отключить, чтобы исчезла удобная форма
+    ]
+}
+```
+
+**drf_site/urls.py**
+
+```python
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('api/v1/womenlist', WomenAPIList.as_view()),
+    path('api/v1/womenlist/<int:pk>', WomenAPIUpdate.as_view()),
+    path('api/v1/womendetail/<int:pk>', WomenAPIDetailView.as_view()),
+]
+```
+
+**women/views.py**
+
+```python
+class WomenAPIUpdate(generics.UpdateAPIView):
+    queryset = Women.objects.all()
+    serializer_class = WomenSerializer
+
+
+class WomenAPIDetailView(generics.RetrieveUpdateDestroyAPIView):
+    # для операций CRUD (Create, Read, Update, Delete)
+    queryset = Women.objects.all()
+    serializer_class = WomenSerializer
 ```
