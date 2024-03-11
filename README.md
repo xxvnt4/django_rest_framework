@@ -8,6 +8,7 @@
 #### [6. Класс ModelSerializer и представление ListCreateAPIView](#класс-modelserializer-и-представление-listcreateapiview)
 #### [7. Представления UpdateAPIView и RetrieveUpdateDestroyAPIView](#представления-updateapiview-и-retrieveupdatedestroyapiview)
 #### [8. Viewsets и ModelViewSet](#viewsets-и-modelviewset)
+#### [9. Роутеры: SimpleRouter и DefaultRouter](#роутеры-simplerouter-и-defaultrouter)
 ---
 
 ## ВВЕДЕНИЕ
@@ -487,4 +488,83 @@ from .serializers import WomenSerializer
 class WomenViewSet(viewsets.ModelViewSet):
     queryset = Women.objects.all()
     serializer_class = WomenSerializer
+```
+
+---
+
+## Роутеры: SimpleRouter и DefaultRouter
+
+[_YouTube_](https://youtu.be/Ur24Ms-MD5k?si=Y2ftiUcpsG8asUIA)
+
+**drf_site/urls.py**
+
+```python
+from django.contrib import admin
+from django.urls import path, include
+from rest_framework import routers
+
+from women.views import *
+
+# роутеры лучше создавать в отдельных файлах
+
+class MyCustomRouter(routers.SimpleRouter):
+    routes = [
+        routers.Route(
+            url=r'^{prefix}$',
+            mapping={'get': 'list'},
+            detail=False,
+            initkwargs={'suffix': 'List'}
+        ),
+        routers.Route(
+            url=r'^{prefix}/{lookup}§',
+            mapping={'get': 'retrieve'},
+            name='{basename}-detail',
+            detail=True,
+            initkwargs={'suffix': 'Detail'}
+        )
+    ]
+
+# router = routers.SimpleRouter()
+# router = routers.DefaultRouter()
+router = MyCustomRouter()
+router.register(r'women', WomenViewSet, basename='women')
+# когда убираем queryset из WomenViewSet, нам нужно прописать basename
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('api/v1/', include(router.urls))
+    # path('api/v1/womenlist', WomenViewSet.as_view({'get': 'list'})),
+    # path('api/v1/womenlist/<int:pk>', WomenViewSet.as_view({'put': 'update'})),
+    # path('api/v1/womendetail/<int:pk>', WomenAPIDetailView.as_view()),
+]
+```
+
+**women/views.py**
+
+```python
+from rest_framework.decorators import action
+from rest_framework.response import Response
+
+
+class WomenViewSet(viewsets.ModelViewSet):
+    # queryset = Women.objects.all()
+    serializer_class = WomenSerializer
+
+    def get_queryset(self): # получить одну запись не получится, чтобы ошибок не было, нужно сделать то, что ниже
+        pk = self.kwargs.get("pk")
+
+        if not pk:
+            return Women.objects.all()[:3]
+
+        return Women.objects.filter(pk=pk)
+
+        # return Women.objects.all()[:3]
+
+    @action(methods=['get'], detail=True)
+    def category(self, request, pk=None):
+        # cats = Category.objects.all()
+        cats = Category.objects.get(pk=pk)
+
+        # return Response({'cats': [c.name for c in cats]})
+        return Response({'cats': cats.name})
 ```
