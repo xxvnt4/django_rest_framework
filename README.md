@@ -7,6 +7,7 @@
 #### [5. Методы save(), create() и update() класса Serializer](#методы-save-create-и-update-класса-serializer)
 #### [6. Класс ModelSerializer и представление ListCreateAPIView](#класс-modelserializer-и-представление-listcreateapiview)
 #### [7. Представления UpdateAPIView и RetrieveUpdateDestroyAPIView](#представления-updateapiview-и-retrieveupdatedestroyapiview)
+#### [8. Viewsets и ModelViewSet](#viewsets-и-modelviewset)
 ---
 
 ## ВВЕДЕНИЕ
@@ -447,6 +448,43 @@ class WomenAPIUpdate(generics.UpdateAPIView):
 
 class WomenAPIDetailView(generics.RetrieveUpdateDestroyAPIView):
     # для операций CRUD (Create, Read, Update, Delete)
+    queryset = Women.objects.all()
+    serializer_class = WomenSerializer
+```
+
+---
+
+## Viewsets и ModelViewSet
+
+[_YouTube_](https://youtu.be/FiRmAMroTh0?si=N7lnuqVPv-WR6z-Z)
+
+**drf_site/urls.py**
+
+```python
+from django.urls import path, include
+from rest_framework import routers
+
+from women.views import *
+
+router = routers.SimpleRouter()
+router.register(r'women', WomenViewSet)
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('api/v1/', include(router.urls)),
+]
+```
+
+**women/views.py**
+
+```python
+from rest_framework import viewsets
+
+from .models import Women
+from .serializers import WomenSerializer
+
+
+class WomenViewSet(viewsets.ModelViewSet):
     queryset = Women.objects.all()
     serializer_class = WomenSerializer
 ```

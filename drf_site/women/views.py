@@ -1,32 +1,32 @@
-from django.forms import model_to_dict
-from django.shortcuts import render
-from rest_framework import generics
-from rest_framework.response import Response
+from rest_framework import viewsets
 
 from .models import Women
 from .serializers import WomenSerializer
-from rest_framework.views import APIView
 
+
+class WomenViewSet(viewsets.ModelViewSet):
+    queryset = Women.objects.all()
+    serializer_class = WomenSerializer
 
 # class WomenAPIView(generics.ListAPIView):
 #     queryset = Women.objects.all()
 #     serializer_class = WomenSerializer
 
 
-class WomenAPIList(generics.ListCreateAPIView):
-    queryset = Women.objects.all()
-    serializer_class = WomenSerializer
-
-
-class WomenAPIUpdate(generics.UpdateAPIView):
-    queryset = Women.objects.all()
-    serializer_class = WomenSerializer
-
-
-class WomenAPIDetailView(generics.RetrieveUpdateDestroyAPIView):
-    # для операций CRUD (Create, Read, Update, Delete)
-    queryset = Women.objects.all()
-    serializer_class = WomenSerializer
+# class WomenAPIList(generics.ListCreateAPIView):
+#     queryset = Women.objects.all()
+#     serializer_class = WomenSerializer
+#
+#
+# class WomenAPIUpdate(generics.UpdateAPIView):
+#     queryset = Women.objects.all()
+#     serializer_class = WomenSerializer
+#
+#
+# class WomenAPIDetailView(generics.RetrieveUpdateDestroyAPIView):
+#     # для операций CRUD (Create, Read, Update, Delete)
+#     queryset = Women.objects.all()
+#     serializer_class = WomenSerializer
 
 
 # class WomenAPIView(APIView):
