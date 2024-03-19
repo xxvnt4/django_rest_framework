@@ -3,3 +3,5 @@ from .models import Women, Category
 
 admin.site.register(Women)
 admin.site.register(Category)
+
+# Ваш_проект/ваше_приложение/admin.py

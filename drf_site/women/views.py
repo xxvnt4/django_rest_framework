@@ -1,32 +1,49 @@
-from rest_framework import viewsets
-from rest_framework.decorators import action
-from rest_framework.response import Response
+from rest_framework import generics
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
-from .models import Women, Category
+from .models import Women
+from .permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
 from .serializers import WomenSerializer
 
 
-class WomenViewSet(viewsets.ModelViewSet):
-    # queryset = Women.objects.all()
+class WomenAPIList(generics.ListCreateAPIView):
+    queryset = Women.objects.all()
     serializer_class = WomenSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
 
-    def get_queryset(self): # получить одну запись не получится, чтобы ошибок не было, нужно сделать то, что ниже
-        pk = self.kwargs.get("pk")
 
-        if not pk:
-            return Women.objects.all()[:3]
+class WomenAPIUpdate(generics.RetrieveUpdateAPIView):
+    queryset = Women.objects.all()
+    serializer_class = WomenSerializer
+    permission_classes = (IsOwnerOrReadOnly,)
 
-        return Women.objects.filter(pk=pk)
 
-        # return Women.objects.all()[:3]
+class WomenAPIDestroy(generics.RetrieveDestroyAPIView):
+    queryset = Women.objects.all()
+    serializer_class = WomenSerializer
+    permission_classes = (IsAdminOrReadOnly,)
 
-    @action(methods=['get'], detail=True)
-    def category(self, request, pk=None):
-        # cats = Category.objects.all()
-        cats = Category.objects.get(pk=pk)
-
-        # return Response({'cats': [c.name for c in cats]})
-        return Response({'cats': cats.name})
+# class WomenViewSet(viewsets.ModelViewSet):
+#     # queryset = Women.objects.all()
+#     serializer_class = WomenSerializer
+#
+#     def get_queryset(self): # получить одну запись не получится, чтобы ошибок не было, нужно сделать то, что ниже
+#         pk = self.kwargs.get("pk")
+#
+#         if not pk:
+#             return Women.objects.all()[:3]
+#
+#         return Women.objects.filter(pk=pk)
+#
+#         # return Women.objects.all()[:3]
+#
+#     @action(methods=['get'], detail=True)
+#     def category(self, request, pk=None):
+#         # cats = Category.objects.all()
+#         cats = Category.objects.get(pk=pk)
+#
+#         # return Response({'cats': [c.name for c in cats]})
+#         return Response({'cats': cats.name})
 
 # class WomenAPIView(generics.ListAPIView):
 #     queryset = Women.objects.all()

@@ -9,6 +9,7 @@
 #### [7. Представления UpdateAPIView и RetrieveUpdateDestroyAPIView](#представления-updateapiview-и-retrieveupdatedestroyapiview)
 #### [8. Viewsets и ModelViewSet](#viewsets-и-modelviewset)
 #### [9. Роутеры: SimpleRouter и DefaultRouter](#роутеры-simplerouter-и-defaultrouter)
+#### [10. Permissions](#permissions)
 ---
 
 ## ВВЕДЕНИЕ
@@ -568,4 +569,116 @@ class WomenViewSet(viewsets.ModelViewSet):
 
         # return Response({'cats': [c.name for c in cats]})
         return Response({'cats': cats.name})
+```
+
+---
+
+## PERMISSIONS
+
+[_YouTube_](https://youtu.be/PQwDeI0DDW4?si=Lde9IPvf6uMTKOKZ)
+
+AllowAny - полный доступ;
+IsAuthenticated - только для авторизованных пользователей;
+IsAdminUser - только для администраторов;
+IsAuthenticatedOrReadOnly - только для авторизованных или всем, но для чтения.
+
+Custom permissions:
+
+class BasePermission(metaclass=BasePermissionMetaclass):
+    def has_permission(self, request, view):
+        return True # права доступа на уровне всего запроса от клиента
+    def has_object_permission(self, request, view, obj):
+        return True # права доступа на уровне отдельного объекта
+
+**women/urls.py**
+
+```python
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('api/v1/women/', WomenAPIList.as_view()),
+    path('api/v1/women/<int:pk>/', WomenAPIUpdate.as_view()),
+    path('api/v1/womendelete/<int:pk>/', WomenAPIDestroy.as_view()),
+]
+```
+
+**women/models.py**
+
+```python
+class Women(models.Model):
+    title = models.CharField(max_length=255)
+    content = models.TextField(blank=True)
+    time_create = models.DateTimeField(auto_now_add=True)
+    time_update = models.DateTimeField(auto_now=True)
+    is_published = models.BooleanField(default=True)
+    cat = models.ForeignKey('Category', on_delete=models.PROTECT, null=True)
+    user = models.ForeignKey(User, verbose_name='User', on_delete=models.CASCADE)
+    
+    def __str__(self):
+        return self.title
+```
+
+**women/views.py**
+
+```python
+class WomenAPIList(generics.ListCreateAPIView):
+    queryset = Women.objects.all()
+    serializer_class = WomenSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+
+class WomenAPIUpdate(generics.RetrieveUpdateAPIView):
+    queryset = Women.objects.all()
+    serializer_class = WomenSerializer
+    permission_classes = (IsOwnerOrReadOnly,)
+
+class WomenAPIDestroy(generics.RetrieveDestroyAPIView):
+    queryset = Women.objects.all()
+    serializer_class = WomenSerializer
+    permission_classes = (IsAdminOrReadOnly,)
+```
+
+**drf_site/settings.py**
+
+```python
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': [  # класс рендера
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',  # API браузера, нужно отключить, чтобы исчезла удобная форма
+    ],
+
+    'DFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ]
+}
+```
+
+**women/serializers.py**
+
+```python
+class WomenSerializer(serializers.ModelSerializer):
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+
+    class Meta:
+        model = Women
+        fields = "__all__"
+```
+
+**women/permissions.py**
+
+```python
+from rest_framework import permissions
+
+
+class IsAdminOrReadOnly(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+
+        return bool(request.user and request.user.is_staff)
+
+class IsOwnerOrReadOnly(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+
+        return obj.user == request.user
 ```

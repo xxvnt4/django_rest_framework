@@ -123,5 +123,9 @@ REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': [  # класс рендера
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',  # API браузера, нужно отключить, чтобы исчезла удобная форма
+    ],
+
+    'DFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
     ]
 }
