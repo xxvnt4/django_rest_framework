@@ -11,6 +11,7 @@ class MyCustomRouter(routers.SimpleRouter):
         routers.Route(
             url=r'^{prefix}$',
             mapping={'get': 'list'},
+            name='{basename}-list',
             detail=False,
             initkwargs={'suffix': 'List'}
         ),
