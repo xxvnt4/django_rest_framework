@@ -11,6 +11,7 @@
 #### [9. Роутеры: SimpleRouter и DefaultRouter](#роутеры-simplerouter-и-defaultrouter)
 #### [10. Permissions](#permissions)
 #### [11. Авторизация и аутентификация, Session-based Authentication](#авторизация-и-аутентификаця-session-based-authentication)
+#### [12. Аутентификация по токенам, пакет Djoser](#аутентификация-по-токенам-пакет-djoser)
 ---
 
 ## ВВЕДЕНИЕ
@@ -710,4 +711,75 @@ urlpatterns = [
     path('api/v1/womendelete/<int:pk>/', WomenAPIDestroy.as_view()),
 
 ]
+```
+
+## АУТЕНТИФИКАЦИЯ ПО ТОКЕНАМ, ПАКЕТ DJOSER
+
+[_YouTube_](https://youtu.be/8_wR-PIsS2c?si=7ntewRqIs4-aeZNA)
+
+- обычная аутентификация токенами (библиотека Djoser)
+- JWT-токены (библиотека Simple JWT)
+
+**women/urls.py**
+
+```python
+from django.urls import path, include, re_path
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    # path('api/v1/', include(router.urls)),
+    # path('api/v1/womenlist', WomenViewSet.as_view({'get': 'list'})),
+    # path('api/v1/womenlist/<int:pk>', WomenViewSet.as_view({'put': 'update'})),
+    # path('api/v1/womendetail/<int:pk>', WomenAPIDetailView.as_view()),
+    path('api/v1/drf-auth/', include('rest_framework.urls')),
+    path('api/v1/women/', WomenAPIList.as_view()),
+    path('api/v1/women/<int:pk>/', WomenAPIUpdate.as_view()),
+    path('api/v1/womendelete/<int:pk>/', WomenAPIDestroy.as_view()),
+    path('api/v1/auth/', include('djoser.urls')),
+    re_path(r'^auth/', include('djoser.urls.authtoken')),
+]
+```
+
+**women/views.py**
+
+```python
+class WomenAPIUpdate(generics.RetrieveUpdateAPIView):
+    queryset = Women.objects.all()
+    serializer_class = WomenSerializer
+    permission_classes = (IsAuthenticated,)
+    # authentication_classes = (TokenAuthentication,)
+```
+
+**drf_site/settings.py**
+
+```python
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'women.apps.WomenConfig',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'djoser',
+]
+
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': [  # класс рендера
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',  # API браузера, нужно отключить, чтобы исчезла удобная форма
+    ],
+
+    'DFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ],
+
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ]
+}
 ```
