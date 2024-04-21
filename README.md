@@ -10,6 +10,7 @@
 #### [8. Viewsets и ModelViewSet](#viewsets-и-modelviewset)
 #### [9. Роутеры: SimpleRouter и DefaultRouter](#роутеры-simplerouter-и-defaultrouter)
 #### [10. Permissions](#permissions)
+#### [11. Авторизация и аутентификация, Session-based Authentication](#авторизация-и-аутентификаця-session-based-authentication)
 ---
 
 ## ВВЕДЕНИЕ
@@ -681,4 +682,32 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
             return True
 
         return obj.user == request.user
+```
+
+---
+
+## АВТОРИЗАЦИЯ И АУТЕНТИФИКАЦИЯ, SESSION-BASED AUTHENTICATION
+
+[_YouTube_](https://youtu.be/cDMwX00FY80?si=n7M_0T8Fzjw18vOz)
+
+Session-Based Authentication - аутентификация на основе сессий и cookies
+Token-Based Authentication - аутентификация на основе токенов
+JSON Web Token (JWT) Authentication - аутентификация на основе JWT-токенов
+Django REST Framework OAuth - авторизация через социальные сети
+
+**women/urls.py**
+
+```python
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    # path('api/v1/', include(router.urls)),
+    # path('api/v1/womenlist', WomenViewSet.as_view({'get': 'list'})),
+    # path('api/v1/womenlist/<int:pk>', WomenViewSet.as_view({'put': 'update'})),
+    # path('api/v1/womendetail/<int:pk>', WomenAPIDetailView.as_view()),
+    path('api/v1/drf-auth/', include('rest_framework.urls')),
+    path('api/v1/women/', WomenAPIList.as_view()),
+    path('api/v1/women/<int:pk>/', WomenAPIUpdate.as_view()),
+    path('api/v1/womendelete/<int:pk>/', WomenAPIDestroy.as_view()),
+
+]
 ```
